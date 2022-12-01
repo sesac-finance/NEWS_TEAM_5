@@ -1,7 +1,5 @@
 import scrapy
 import datetime
-import pandas as pd
-
 
 
 class NaverLifeSpider(scrapy.Spider):
@@ -10,10 +8,10 @@ class NaverLifeSpider(scrapy.Spider):
     start_urls = ['http://news.naver.com/']
 
     def start_requests(self):
-        for term in range(0, 30): # 30으로 바꾸기
+        for term in range(0, 30):
         # datetime을 이용한 특정 기간 출력 (20221101 ~ 20221130)
             date = (datetime.date(2022, 11, 1) + datetime.timedelta(+term)).strftime('%Y%m%d')
-            pages = range(1, 50) # 생활문화 최대페이지 확인
+            pages = range(1, 50)
             subcategory_lists = ['237', '238', '239', '240', '241', '242', '243', '244', '245', '248', '376']
             
             for i in range(len(subcategory_lists)):
@@ -35,17 +33,6 @@ class NaverLifeSpider(scrapy.Spider):
                     
                 yield scrapy.Request(url, callback=self.parse_dir_contents, meta={'subcategory':subcategory})
 
-    # def parse_link(self, response):
-    #     subcategory = response.xpath('//*[@id="main_content"]/div[1]/h3/text()').extract()
-    #     news_sels = response.css('.type06_headline > li')
-    #     # news_sels = response.xpath('//*[@id="main_content"]/div[2]/ul[1]')
-
-    #     for news_sel in news_sels:
-    #         for href in news_sel.css('dl dt > a[href]::attr(href)'):
-    #         # for href in news_sel.xpath('//*[@id="main_content"]/div[2]/ul[1]/li[1]/dl/dt[2]/a/@href'):
-    #             url = response.urljoin(href.extract())
-                    
-    #             yield scrapy.Request(url, callback=self.parse_dir_contents, meta={'subcategory':subcategory})
 
 
 
