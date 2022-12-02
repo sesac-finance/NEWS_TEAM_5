@@ -7,7 +7,6 @@ import re
 # 뉴스 본문 article : MainCategory,SubCategory,WritedAt,Title,Content,URL,PhotoURL,Writer,Press,Stickers
 # 뉴스 댓글 comments : URL,UserID,UserName,WritedAt,Content
 # 위에서 본문 댓글 모두 Content 컬럼 위치는 df[4] 로 동일함.
-# num은 일련번호, date 포맷은 1999.01.01, text 는 한글/영어/숫자/기호가 섞여있는 뉴스기사 본문임
 
 maxInt = sys.maxsize
 
@@ -28,7 +27,8 @@ while True:
                 list_string = []
                 new_string = ""
 
-                for i, row in enumerate(csvreader):      
+                for i, row in enumerate(csvreader):
+
                     # 아래에서 row[4] 가 Content 컬럼(본문) 임. 댓글도 동일하게 Content 가 row[4]
                     list_string = re.findall(r"""[ㄱ-ㅣ가-힣]|[ |\,|\.]""",  row[4])
                     
@@ -38,7 +38,8 @@ while True:
 
                     else :
                         t = ''
-                        # 아래에서 본문 기사 하나 즉, csv 파일 Content 컬럼에서 한 줄을 조립하여 만든다. 불필요한 부분 제거 작업.
+                        # 아래에서 본문 기사 하나 즉, csv 파일 Content 컬럼에서 한 줄을 조립하여 만든다(t).
+                        # 추가로 띄어쓰기도 함께 하는데 re 정규표현식이 글자단위로 결과를 output 하기 때문임.
                         for x in list_string:
                             if x =='' :
                                 t += ' '
