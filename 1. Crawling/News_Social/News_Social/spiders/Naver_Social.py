@@ -1,7 +1,6 @@
 import scrapy
 import datetime
-import pandas as pd
-# from News_Social.items import NewsSocialItem
+
 
 class NaverSocialSpider(scrapy.Spider):
     name = 'Naver_Social'
