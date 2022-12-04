@@ -7,11 +7,12 @@ class NaverSocialSpider(scrapy.Spider):
     allowed_domains = ['news.naver.com']
     start_urls = ['http://news.naver.com/']
 
+
     def start_requests(self):
         for term in range(0, 30):
         # datetime을 이용한 특정 기간 출력 (20221101 ~ 20221130)
             date = (datetime.date(2022, 11, 1) + datetime.timedelta(+term)).strftime('%Y%m%d')
-            pages = range(1, 350) # 사회일반때문에 350 (확인 결과 최대 316p)
+            pages = range(1, 350)
             subcategory_lists = ['249', '250', '251', '252', '254', '255', '256', '257', '276', '59b']
 
             for i in range(len(subcategory_lists)):
@@ -23,12 +24,11 @@ class NaverSocialSpider(scrapy.Spider):
                     yield scrapy.Request(url=urls, headers = headers, callback=self.parse_link)
 
 
-
     def parse_link(self, response):
         subcategory = response.xpath('//*[@id="main_content"]/div[1]/h3/text()').extract()
-        news_sels = response.css('.type06_headline > li')
-        for news_sel in news_sels:
-            for href in news_sel.css('dl dt > a[href]::attr(href)'):
+        news_selects = response.css('.type06_headline > li')
+        for news_select in news_selects:
+            for href in news_select.css('dl dt > a[href]::attr(href)'):
                 url = response.urljoin(href.extract())
                 yield scrapy.Request(url, callback=self.parse_dir_contents, meta={'subcategory':subcategory})
 
@@ -50,6 +50,8 @@ class NaverSocialSpider(scrapy.Spider):
 
         url = response.xpath('/html/head/meta[6]').get().split('content=')[1].split('>')[0]
         photourl = response.xpath('//*[@id="img1"]').get().split('src=')[1].split(' ')[0]
+
+        writer = response.xpath('//*[@id="ct"]/div[1]/div[3]/div[2]/a/em/text()').extract()
         press = response.xpath('//*[@id="ct"]/div[1]/div[1]/a/img[1]/@alt').extract()
 
         item['MainCategory'] = maincategory
@@ -59,6 +61,7 @@ class NaverSocialSpider(scrapy.Spider):
         item['Content'] = content
         item['URL'] = url
         item['PhotoURL'] = photourl
+        item['Writer'] = writer
         item['Press'] = press
 
 

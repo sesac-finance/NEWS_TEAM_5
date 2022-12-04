@@ -7,6 +7,7 @@ class NaverLifeSpider(scrapy.Spider):
     allowed_domains = ['news.naver.com']
     start_urls = ['http://news.naver.com/']
 
+
     def start_requests(self):
         for term in range(0, 30):
         # datetime을 이용한 특정 기간 출력 (20221101 ~ 20221130)
@@ -26,14 +27,12 @@ class NaverLifeSpider(scrapy.Spider):
 
     def parse_link(self, response):
         subcategory = response.xpath('//*[@id="main_content"]/div[1]/h3/text()').extract()
-        news_sels = response.css('.type06_headline > li')
-        for news_sel in news_sels:
-            for href in news_sel.css('dl dt > a[href]::attr(href)'):
+        news_selects = response.css('.type06_headline > li')
+        for news_select in news_selects:
+            for href in news_select.css('dl dt > a[href]::attr(href)'):
                 url = response.urljoin(href.extract())
                     
                 yield scrapy.Request(url, callback=self.parse_dir_contents, meta={'subcategory':subcategory})
-
-
 
 
     def parse_dir_contents(self, response):
@@ -53,6 +52,8 @@ class NaverLifeSpider(scrapy.Spider):
 
         url = response.xpath('/html/head/meta[6]').get().split('content=')[1].split('>')[0]
         photourl = response.xpath('//*[@id="img1"]').get().split('src=')[1].split(' ')[0]
+       
+        writer = response.xpath('//*[@id="ct"]/div[1]/div[3]/div[2]/a/em/text()').extract()
         press = response.xpath('//*[@id="ct"]/div[1]/div[1]/a/img[1]/@alt').extract()
 
 
@@ -63,6 +64,7 @@ class NaverLifeSpider(scrapy.Spider):
         item['Content'] = content
         item['URL'] = url
         item['PhotoURL'] = photourl
+        item['Writer'] = writer
         item['Press'] = press
 
 
