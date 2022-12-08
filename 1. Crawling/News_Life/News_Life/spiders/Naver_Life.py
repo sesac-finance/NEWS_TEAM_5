@@ -18,6 +18,13 @@ class NaverLifeSpider(scrapy.Spider):
             for i in range(len(subcategory_lists)):
                 sub = subcategory_lists[i]
                 
+                # 네이버 뉴스 주소 형태 : https://news.naver.com/main/list.naver?mode=LS2D&mid=shm&sid2=241&sid1=103&date=20221130&page=2
+                # 241 -> 서브카테고리 고유번호
+                # 237 - 여행/레저, 238 - 음식/맛집, 239 - 자동차/시승기, 240 - 도로/교통, 241 - 건강정보, 242 - 공연/전시, 243 - 책, 244 - 종교, 245 - 생활문화 일반, 248 - 날씨, 376 - 패션/뷰티
+                # 103 : 메인카테고리 고유번호(생활/문화)
+                # date= -> 날짜
+                # page= -> 페이지
+
                 for page in pages:
                     urls = 'https://news.naver.com/main/list.naver?mode=LS2D&mid=shm&sid2={0}&sid1=103&date={1}&page={2}'.format(sub, date, page)
                     headers = {"user-agent" : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'}
@@ -26,7 +33,11 @@ class NaverLifeSpider(scrapy.Spider):
 
 
     def parse_link(self, response):
+
+        # 서브카테고리 목록
         subcategory = response.xpath('//*[@id="main_content"]/div[1]/h3/text()').extract()
+
+        # href
         news_selects = response.css('.type06_headline > li')
         for news_select in news_selects:
             for href in news_select.css('dl dt > a[href]::attr(href)'):
@@ -39,11 +50,12 @@ class NaverLifeSpider(scrapy.Spider):
 
         item={}
 
+        # 기사 본문
         full_text = response.css('#dic_area::text').extract()
         content = []
         for text in full_text:
             content.append(text.strip())
-
+        
         maincategory = response.xpath('//*[@id="_LNB"]/ul/li[5]/a/span/text()').extract()
         subcategory = response.meta.get('subcategory')
 
